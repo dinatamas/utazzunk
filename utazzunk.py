@@ -6,23 +6,24 @@ from operator import attrgetter
 from ryanair import Ryanair
 
 
+CHEAP_CUTOFF = 100_000
+
+LEAVE_FROM = datetime(2024, 8, 24)
+LEAVE_TO = datetime(2024, 8, 25)
+RETURN_FROM = datetime(2024, 8, 26)
+RETURN_TO = datetime(2024, 8, 27)
+
+
 class SuperRyanair(Ryanair):
-    def supersearch(
-        self,
-        airports,
-        leave_from,
-        leave_to,
-        return_from,
-        return_to,
-    ):
+    def supersearch(self, airports):
         best = dict()
         for airport in airports:
             trips = self.get_cheapest_return_flights(
                 airport,
-                leave_from,
-                leave_to,
-                return_from,
-                return_to,
+                LEAVE_FROM,
+                LEAVE_TO,
+                RETURN_FROM,
+                RETURN_TO,
             )
             for trip in trips:
                 dest = trip.outbound.destination
@@ -63,13 +64,8 @@ def main():
     # inbound and outbound flights separately.
     #
 
-    leave_from = datetime(2024, 3, 10)
-    leave_to = datetime(2024, 3, 11)
-    return_from = datetime(2024, 3, 15)
-    return_to = datetime(2024, 3, 16)
-
-    best = api.supersearch(airports, leave_from, leave_to, return_from, return_to)
-    best = [t for t in best.values() if t[0].price + t[1].price < 40000]
+    best = api.supersearch(airports)
+    best = [t for t in best.values() if t[0].price + t[1].price < CHEAP_CUTOFF]
 
     print()
     tprint(
@@ -77,7 +73,7 @@ def main():
         *[
             [
                 t[0].price + t[1].price,
-                t[0].destinationFull.split(",")[0],
+                t[0].destinationFull,
                 t[0].origin,
                 t[0].departureTime.strftime("%m.%d. %H:%M"),
                 t[1].destination,
@@ -85,6 +81,7 @@ def main():
             ] for t in best
         ]
     )
+    print()
 
 
 def tprint(*rows):
@@ -119,6 +116,6 @@ if __name__ == "__main__":
 #   - Find way to search inbound flights.
 #   - Alternatives for multiple airports.
 #   - Alternatives for dates: +/- days for how much?
-#   - Better date ranges.
+#   - Better date ranges + validate them
 #   - Add WizzAir!
 #
