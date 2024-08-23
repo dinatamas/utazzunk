@@ -1,2 +1,5 @@
+flixbus
+requests
 ryanair-py
 pyyaml
+tqdm
