@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{ url_for('static', filename= 'style.css') }}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <title>Flow Utazgatás</title>
+</head>
+<body>
+  <div class="container">
+    <p></p>
+    <h1>Ryanair</h1>
+    <p></p>
+    <p><b>Indulás:</b> {{ ind }}</p>
+    <p><b>Érkezés:</b> {{ erk }}</p>
+    <p><b>Költség:</b> {{ kot }}</p>
+    <p></p>
+    <button onclick="window.location='/'" class="btn btn-primary">Back</button>
+    <p></p>
+    <table class="table">
+      <thead>
+        <th scope="col">Price</th>
+        <th scope="col">Destination</th>
+        <th scope="col">From</th>
+        <th scope="col">Leave</th>
+        <th scope="col">To</th>
+        <th scope="col">Return</th>
+      </thead>
+    {% for f in ryanair %}
+      <tr>
+        <td>{{ f[0].price + f[1].price }} Ft</td>
+        <td>{{ f[0].destinationFull }}</td>
+        <td>{{ f[0].origin }}</td>
+        <td>{{ f[0].departureTime.strftime("%m.%d. %H:%M") }}</td>
+        <td>{{ f[1].destination }}</td>
+        <td>{{ f[1].departureTime.strftime("%m.%d. %H:%M") }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+  </div>
+</body>
+</html>

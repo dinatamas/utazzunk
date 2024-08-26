@@ -43,7 +43,7 @@ class SuperFlixbus(Flixbus):
             "search_by=cities&" +
             "include_after_midnight_rides=0"
         )
-        response = requests.get(url, timeout=3)
+        response = requests.get(url, timeout=1)
         parsed_trips = self.parse_content(response.text)
         # Filter sold out trips.
         good_trips = list()
@@ -63,6 +63,7 @@ def get_flixbus(
         depart_to=DEPART_TO,
         arrive_from=ARRIVE_FROM,
         arrive_to=ARRIVE_TO,
+        max_dur=MAX_DUR,
     ):
     FLIXBUS_URL = "https://global.api.flixbus.com"
     BUDAPEST = "40de6527-8646-11e6-9066-549f350fcb0c"
@@ -108,7 +109,7 @@ def get_flixbus(
                     ldur = lbest.arrival_date_time - lbest.departure_date_time
                     rtime = rbest.departure_date_time.strftime("%m.%d. %H:%M")
                     rdur = rbest.arrival_date_time - rbest.departure_date_time
-                    if ldur > MAX_DUR or rdur > MAX_DUR:
+                    if ldur > max_dur or rdur > max_dur:
                         continue
                     best.append(
                         (
@@ -170,15 +171,10 @@ def get_ryanair(
     return best
 
 
-def main():
-    args = parse_args()
-
-    best = get_ryanair(extended=args.A)
-    print()
-    print("===== RYANAIR =====")
-    print()
+def format_ryanair(best):
+    result = ""
     if best:
-        tprint(
+        result += tprint(
             ["Price", "Destination", "From", "Leave", "To", "Return"],
             *[
                 [
@@ -192,13 +188,13 @@ def main():
             ]
         )
     else:
-        print("No destinations are cheap enough")
-    print()
+        result += "No destinations are cheap enough\n"
+    return result
 
-    best = get_flixbus()
-    print("===== FLIXBUS =====")
-    print()
-    tprint(
+
+
+def format_flixbus(best):
+    result = tprint(
         ["Price", "Destination", "Leave", "Return"],
         *[
             [
@@ -209,19 +205,22 @@ def main():
             ] for price, name, country, dep, ret in best
         ]
     )
-    #if args.s:
-    #    print("Stats:")
-    #    for name, cities in sorted(COUNTRIES.items()):
-    #        print(f"  - {name}: {len(cities)}")
-    #    print()
-    #if args.c:
-    #    for name, cities in sorted(COUNTRIES.items()):
-    #        print()
-    #        print(f"### {name}: ###")
-    #        for c in cities:
-    #            print(f"   {c['name']} ({c['slug']}) - {c['price']['HUF']['min']}")
-    #    print()
+    return result
+
+
+def main():
+    args = parse_args()
+
+    best = get_ryanair(extended=args.A)
     print()
+    print("===== RYANAIR =====")
+    print()
+    print(format_ryanair(best))
+
+    best = get_flixbus()
+    print("===== FLIXBUS =====")
+    print()
+    print(format_flixbus(best))
 
 
 def tprint(*rows):
@@ -237,15 +236,15 @@ def tprint(*rows):
             newrows.append(newcells)
     rows = newrows
     widths = [max(len(row[i]) for row in rows) for i in range(len(rows[0]))]
+    result = ""
     for row in [rows[0], ["-" * len(header) for header in rows[0]], *rows[1:]]:
-        print("   " + "  ".join(cell.ljust(width) for cell, width in zip(row, widths)))
+        result += ("  ".join(cell.ljust(width) for cell, width in zip(row, widths))) + "\n"
+    return result
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-A", action="store_true", help="include BTS+VIE airports too")
-    #parser.add_argument("-c", action="store_true", help="print Flixbus cities")
-    #parser.add_argument("-s", action="store_true", help="print Flixbus stats")
     return parser.parse_args()
 
 

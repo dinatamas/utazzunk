@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="static/flixbus.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename= 'style.css') }}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <title>Flow Utazgatás</title>
+</head>
+<body>
+  <div class="container">
+    <p></p>
+    <h1>Flixbus</h1>
+    <p></p>
+    <p>A Flixbus találatok szépen lassan betöltődnek :)</p>
+    <p></p>
+    <p><b>Indulás:</b> {{ ind }}</p>
+    <p><b>Érkezés:</b> {{ erk }}</p>
+    <p><b>Költség:</b> {{ kot }}</p>
+    <p><b>Max Utazás:</b> {{ dur }}</p>
+    <button onclick="window.location='/'" class="btn btn-primary">Back</button>
+    <p></p>
+    <p id="myp"></p>
+    <table class="table" id="mydiv">
+      <thead>
+        <th scope="col">Price</th>
+        <th scope="col">Destination</th>
+        <th scope="col">Leave</th>
+        <th scope="col">Return</th>
+      </thead>
+    </table>
+  </div>
+</body>
+</html>
