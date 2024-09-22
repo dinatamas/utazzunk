@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link rel="stylesheet" href="{{ url_for('static', filename= 'style.css') }}">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="{{ url_for( 'static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <title>Flow Utazgatás</title>
 </head>
 <body>
@@ -11,11 +12,11 @@
     <p></p>
     <h1>Ryanair</h1>
     <p></p>
-    <p><b>Indulás:</b> {{ ind }}</p>
-    <p><b>Érkezés:</b> {{ erk }}</p>
-    <p><b>Költség:</b> {{ kot }}</p>
+    <p><b>Indulás:</b> {{ depart_range }}</p>
+    <p><b>Érkezés:</b> {{ arrive_range }}</p>
+    <p><b>Költség:</b> max. {{ cutoff }} Ft</p>
     <p></p>
-    <button onclick="window.location='/'" class="btn btn-primary">Back</button>
+    <button onclick="window.location='/'" class="btn btn-secondary">Back</button>
     <p></p>
     <table class="table">
       <thead>

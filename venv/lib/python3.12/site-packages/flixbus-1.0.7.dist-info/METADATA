@@ -1,0 +1,41 @@
+Metadata-Version: 2.1
+Name: flixbus
+Version: 1.0.7
+Summary: A Flixbus API package with easy to use high-level functions.
+Project-URL: Homepage, https://gitlab.com/jeroenvb3/flixbuspip
+Project-URL: Bug Tracker, https://gitlab.com/jeroenvb3/flixbuspip/-/issues
+Author-email: Jeroen van Bennekum <jeroen_-@live.nl>
+License-File: LICENSE
+Classifier: License :: OSI Approved :: GNU Affero General Public License v3
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.7
+Requires-Dist: beautifulsoup4
+Requires-Dist: requests
+Requires-Dist: requests-cache
+Description-Content-Type: text/markdown
+
+# Flixbus API Class
+This repository provides a Flixbus class which makes it very easy to programmatically search for options on Flixbus.
+
+## Usage
+This will show you the cheapest bus connection between Cambridge and London in November 2023:
+
+```python
+from flixbus import Flixbus
+
+fb = Flixbus(['united-kingdom'])
+cheapest = fb.get_cheapest_for_range("01-11-2023", "01-12-2023", "Cambridge", "London")
+```
+
+This will give the following result:
+
+```
+{'arrival_city_id': '40dfdfd8-8646-11e6-9066-549f350fcb0c',
+ 'arrival_date_time': '2023-11-01T07:20:00+00:00',
+ 'departure_city_id': '3665c7fe-fc24-4b50-9b52-2187944b362c',
+ 'departure_date_time': '2023-11-01T05:20:00+00:00',
+ 'duration': {'hours': 2, 'minutes': 0},
+ 'duration_str': '2h 0m',
+ 'price': 4.49}
+```

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="{{ url_for( 'static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <title>Flow Utazgatás</title>
+</head>
+<body>
+  <div class="container">
+    <p></p>
+    <h1>Flixbus Config</h1>
+    <p></p>
+    <form>
+    {% for c in COUNTRIES %}
+      <h1>{{ c }}</h1>
+      <div class="form-check form-group">
+        <input type="checkbox" class="form-check-input" />
+        <label class="form-check-label">bigzo</label>
+      </div>
+    {% endfor %}
+    <!-- This should get you back to previous Flixbus page! -->
+    <button onclick="history.back()" class="btn btn-secondary">Back</button>
+    </form>
+  </div>
+</body>
+</html>

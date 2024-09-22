@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hu">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="{{ url_for( 'static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
   <script src="static/flixbus.js"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename= 'style.css') }}">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <title>Flow Utazgatás</title>
 </head>
 <body>
@@ -12,22 +13,38 @@
     <p></p>
     <h1>Flixbus</h1>
     <p></p>
-    <p>A Flixbus találatok szépen lassan betöltődnek :)</p>
-    <p></p>
-    <p><b>Indulás:</b> {{ ind }}</p>
-    <p><b>Érkezés:</b> {{ erk }}</p>
-    <p><b>Költség:</b> {{ kot }}</p>
-    <p><b>Max Utazás:</b> {{ dur }}</p>
-    <button onclick="window.location='/'" class="btn btn-primary">Back</button>
+    <div class="row">
+      <div class="col-md-6">
+        <p><b>Indulás:</b> {{ depart_range }}</p>
+        <p><b>Érkezés:</b> {{ arrive_range }}</p>
+        <p><b>Költség:</b> max. {{ cutoff }} Ft</p>
+        <p><b>Max Utazás:</b> {{ maxdur }}</p>
+        <p><b>Max Átszállás:</b> {{ maxtra }}</p>
+      </div>
+      <div class="col-md-6">
+        <div class="container">
+          <div class="text-center">
+            <a href="/flixconf">Országok és városok</a>
+          </div>
+          <p></p>
+          <div class="text-center">
+            <button onclick="doFlixbus()" class="btn btn-primary">Keress!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button onclick="window.location='/'" class="btn btn-secondary">Back</button>
     <p></p>
     <p id="myp"></p>
-    <table class="table" id="mydiv">
+    <table class="table">
       <thead>
         <th scope="col">Price</th>
         <th scope="col">Destination</th>
         <th scope="col">Leave</th>
         <th scope="col">Return</th>
       </thead>
+      <tbody id="mytable">
+      </tbody>
     </table>
   </div>
 </body>

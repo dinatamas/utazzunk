@@ -1,79 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hu">
 <head>
   <meta charset="UTF-8">
-  <link rel="stylesheet" href="{{ url_for('static', filename= 'style.css') }}">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="{{ url_for( 'static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- https://www.daterangepicker.com/ -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
   <title>Flow Utazgatás</title>
 </head>
 <body>
-  <div class="container">
-    <p></p>
-    <h1>Helló helló szia</h1>
-    <p>
-    Ez a weboldal a béta verziója az olcsó utazásokat szervezős programomnak.<br>
-    Később eskü szebb lesz de túl lusta vagyok szép dolgokat alkotni.
-    </p>
-    <form action="/getit" method="get">
-      <h2>Mikor mennél?</h2>
-      <div class="form-group">
-        <label for="depart_from"><b>Legkorábbi</b> időpont mikor <b>elindulnál</b>?</label>
-        <input type="text" name="depart_from"
-               placeholder="Például: 2024.09.23." class="form-control"
-               value="2024.09.23."></input>
+  <p></p>
+  <h1 class="text-center">Helló Helló Szia</h1>
+  <p></p>
+  <div class="container mx-auto" style="width: 85%">
+    <form action="/getit" method="get" class="row g-3">
+      <div class="form-group col-md-3 px-1">
+	<label for="depart_range"><b>Indulás</b></label>
+	<input type="text" name="depart_range" id="depart_range" class="form-control" />
+	<script>
+		$('input[name="depart_range"]').daterangepicker({
+			"opens": "center",
+			"autoApply": true,
+			"startDate": "{{ depfrom }}",
+			"endDate": "{{ depto }}",
+			"locale": { "format": "MM.DD." },
+		})
+	</script>
       </div>
-      <div class="form-group">
-        <label for="depart_to"><b>Legkésőbbi</b> időpont mikor <b>elindulnál</b>?</label>
-        <input type="text" name="depart_to"
-               placeholder="Például: 2024.09.24." class="form-control"
-               value="2024.09.24."></input>
+      <div class="form-group col-md-3 px-1">
+	<label for="arrive_range"><b>Érkezés</b></label>
+	<input type="text" name="arrive_range" id="arrive_range" class="form-control" />
+	<script>
+		$('input[name="arrive_range"]').daterangepicker({
+			"opens": "center",
+			"autoApply": true,
+			"startDate": "{{ arrfrom }}",
+			"endDate": "{{ arrto }}",
+			"locale": { "format": "MM.DD." },
+		})
+	</script>
       </div>
-      <div class="form-group">
-        <label for="arrive_from"><b>Legkorábbi</b> időpont mikor <b>érkeznél?</b></label>
-        <input type="text" name="arrive_from"
-               placeholder="Például: 2024.09.27." class="form-control"
-               value="2024.09.27."></input>
+      <div class="form-group col-md-2 px-1">
+	<label for="cutoff"><b>Költség</b></label>
+        <input type="text" name="cutoff" id="cutoff" value="{{ cutoff }}" class="form-control" />
       </div>
-      <div class="form-group">
-        <label for="arrive_to"><b>Legkésőbbi</b> időpont mikor <b>érkeznél</b>?</label>
-        <input type="text" name="arrive_to"
-               placeholder="Például: 2024.09.28." class="form-control"
-               value="2024.09.28."></input>
+      <div class="form-group col-md-4 align-self-end d-flex justify-content-between px-1">
+        <button type="submit" name="target" value="ryanair" class="w-50 mr-1 px-2 btn btn-primary">Ryanair</button>
+        <button type="submit" name="target" value="flixbus" class="w-50 ml-1 px-2 btn btn-primary">Flixbus</button>
       </div>
-      <h2>Ryanair</h2>
-      <div class="form-group">
-        <label for="ryanair_cutoff">Maximum költség forintban (oda-vissza)?</label>
-        <input type="text" name="ryanair_cutoff"
-               placeholder="Például: 40000" class="form-control"
-               value="40000"></input>
+
+      <!-- SECTION -->
+
+      <div class="form-group col-md-4 px-1">
+	<label for="interval"><b>Intervallum</b></label>
+	<input type="text" name="interval" id="interval" class="form-control" />
+	<script>
+		$('input[name="interval"]').daterangepicker({
+			"opens": "center",
+			"autoApply": true,
+			"startDate": "{{ intfrom }}",
+			"endDate": "{{ intto }}",
+			"locale": { "format": "MM.DD." },
+		})
+	</script>
       </div>
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="extended" value="yes" id="defaultCheck1">
-        <label class="form-check-label" for="defaultCheck1">
-          Indulás Pozsonyból vagy Bécsből?
-        </label>
+      <div class="form-group col-md-3 px-1">
+        <label for="mindays"><b>Min. napok?</b></label>
+        <input type="text" name="mindays" id="mindays" value="{{ mindays }}" class="form-control" />
+      </div>
+      <div class="form-group col-md-3 px-1">
+        <label for="maxdays"><b>Max. napok?</b></label>
+        <input type="text" name="maxdays" id="maxdays" value="{{ maxdays }}" class="form-control" />
+      </div>
+      <div class="form-group col-md-2 px-1 align-self-end">
+        <button type="submit" name="target" value="holiday" class="w-100 mr-1 px-2 btn btn-primary">Tervezz!</button>
+      </div>
+
+      <!-- SECTION -->
+
+      <div class="mx-3 form-check form-group col-md-12">
+	<input type="checkbox" name="extended" id="extended" value="true" {{ extended }} class="form-check-input" />
+        <label class="form-check-label" for="extended">Indulás Pozsonyból vagy Bécsből?</label>
       </div>
       <p></p>
-      <div class="form-group">
-        <button type="submit" name="target" value="ryanair" class="btn btn-primary">Submit</button>
+
+      <!-- SECTION -->
+
+      <div class="form-group col-md-12">
+        <label for="maxdur">Maximum utazási idő órában (per út)?</label>
+        <input type="text" name="maxdur" value="{{ maxdur }}" class="form-control" />
       </div>
-      <h2>Flixbus</h2>
-      <div class="form-group">
-        <label for="flixbus_cutoff">Maximum költség forintban (per utazás)?</label>
-        <input type="text" name="flixbus_cutoff"
-               placeholder="Például: 20000" class="form-control"
-               value="20000"></input>
+      <div class="form-group col-md-12">
+        <label for="maxtra">Maximum átszállások száma (per út)?</label>
+        <input type="text" name="maxtra" value="{{ maxtra }}" class="form-control" />
       </div>
-      <div class="form-group">
-        <label for="max_dur">Maximum utazási idő órában?</label>
-        <input type="text" name="max_dur"
-               placeholder="Például: 10" class="form-control"
-               value="10"></input>
+
+      <!-- SECTION -->
+
+      <div class="form-group col-md-12">
+        <label for="afterwork">Mikori indulást tudsz bevállalni meló után?</label>
+        <input type="text" name="afterwork" value="{{ afterwork }}" class="form-control" />
       </div>
-      <!-- TODO: Max number of transfers? -->
-      <div class="form-group">
-        <button type="submit" name="target" value="flixbus" class="btn btn-primary">Submit</button>
+      <div class="form-group col-md-12 text-center">
+        <button type="submit" name="target" value="magic_weekend" class="mw-50 btn btn-primary">
+          <i>Magic: hétvégi út</i>
+        </button>
       </div>
+      <div class="form-group col-md-12 text-center">
+        <button type="submit" name="target" value="magic_weekend_friday" class="mw-50 btn btn-primary">
+          <i>Magic: hétvégi út + péntek</i>
+        </button>
+      </div>
+      <div class="form-group col-md-12 text-center">
+        <button type="submit" name="target" value="magic_weekend_monday" class="mw-50 btn btn-primary">
+          <i>Magic: hétvégi út + hétfő</i>
+        </button>
+      </div>
+
     </form>
   </div>
 </body>

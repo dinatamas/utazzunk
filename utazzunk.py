@@ -17,7 +17,7 @@ DEPART_TO = datetime(2024, 9, 25)
 ARRIVE_FROM = datetime(2024, 9, 28)
 ARRIVE_TO = datetime(2024, 9, 29)
 
-MAX_DUR = timedelta(hours=10)
+MAXDUR = timedelta(hours=10)
 
 # Less popular Flixbus destinations to still include
 INTERESTING_CITIES = ["Kotor"]
@@ -57,14 +57,47 @@ class SuperFlixbus(Flixbus):
         return city_id
 
 
-def get_flixbus(
-        cutoff=FLIXBUS_CUTOFF,
-        depart_from=DEPART_FROM,
-        depart_to=DEPART_TO,
-        arrive_from=ARRIVE_FROM,
-        arrive_to=ARRIVE_TO,
-        max_dur=MAX_DUR,
-    ):
+COUNTRY_CODES = {
+    "DE": "Németország",
+    "FR": "Franciaország",
+    "PT": "Portugália",
+    "IT": "Olaszország",
+    "CZ": "Csehország",
+    "NL": "Hollandia",
+    "BE": "Belgium",
+    "AT": "Ausztria",
+    "PL": "Lengyelország",
+    "HR": "Horvátország",
+    "DK": "Dánia",
+    "CH": "Svájc",
+    "SK": "Szlovákia",
+    "UA": "Ukrajna",
+    "SI": "Szlovénia",
+    "ES": "Spanyolország",
+    "SE": "Svédország",
+    "RS": "Szerbia",
+    "GB": "Anglia",
+    "LU": "Luxemburg",
+    "BG": "Bulgária",
+    "LT": "Litvánia",
+    "NO": "Norvégia",
+    "LV": "Lettország",
+    "RO": "Románia",
+    "EE": "Észtország",
+    "FI": "Finnország",
+    "GR": "Görögország",
+    "MK": "Észak-Macedónia",
+    "AL": "Albánia",
+    "ME": "Montenegró",
+    "BA": "Bosznia",
+    "MD": "Moldova",
+    "AD": "Andorra",
+    "IE": "Írország",
+    "LI": "Lichtenstein",
+}
+
+
+def get_flixbus_reachable():
     FLIXBUS_URL = "https://global.api.flixbus.com"
     BUDAPEST = "40de6527-8646-11e6-9066-549f350fcb0c"
     REACHABLE_URL = f"{FLIXBUS_URL}/cms/cities/{BUDAPEST}/reachable"
@@ -76,17 +109,30 @@ def get_flixbus(
     for c in response["result"]:
         if c["country"] == "HU":
             continue
-        if "repülőtér" in c["name"]:
+        if "repülőtér" in c["name"].lower():
             continue
         # "Less interesting" destinations with many Flixbus stations.
         if c["name"] not in INTERESTING_CITIES:
             if c["country"] in ("HR", "SK", "RO", "PL"):
-                if c["search_volume"] < 50_000:
+                if c.get("search_volume", 0) < 50_000:
                     continue
-        if "price" in c:
-            if c["price"]["HUF"]["min"] < cutoff:
-                CITIES.append(c)
-                COUNTRIES[c["country"]] = COUNTRIES.get(c["country"], []) + [c]
+        # if "price" in c:
+        #     if c["price"]["HUF"]["min"] < cutoff:
+        CITIES.append(c)
+        key = COUNTRY_CODES[c["country"]]
+        COUNTRIES[key] = COUNTRIES.get(key, []) + [c]
+    return CITIES, COUNTRIES
+
+
+def get_flixbus(
+        cutoff=FLIXBUS_CUTOFF,
+        depart_from=DEPART_FROM,
+        depart_to=DEPART_TO,
+        arrive_from=ARRIVE_FROM,
+        arrive_to=ARRIVE_TO,
+        maxdur=MAXDUR,
+    ):
+    CITIES, COUNTRIES = get_flixbus_reachable()
 
     api = SuperFlixbus()
 
@@ -126,12 +172,14 @@ def get_flixbus(
 
 
 def get_ryanair(
-        extended=False,
-        cutoff=RYANAIR_CUTOFF,
         depart_from=DEPART_FROM,
         depart_to=DEPART_TO,
+        depart_time="00:00",
         arrive_from=ARRIVE_FROM,
         arrive_to=ARRIVE_TO,
+        arrive_time="00:00",
+        cutoff=RYANAIR_CUTOFF,
+        extended=False,
     ):
     api = Ryanair("HUF")
     airports = ["BUD", "BTS", "VIE"] if extended else ["BUD"]
@@ -143,6 +191,9 @@ def get_ryanair(
             depart_to,
             arrive_from,
             arrive_to,
+            outbound_departure_time_from=depart_time,
+            inbound_departure_time_from=arrive_time,
+            # max_price parameter?
         )
         for trip in trips:
             dest = trip.outbound.destination
@@ -250,34 +301,3 @@ def parse_args():
 
 if __name__ == "__main__":
     main()
-
-
-#
-# TODO:
-#   - Compare Flixbus prices to BTS and VIE for connections
-#   - Get all Flixbus destinations from Budapest
-#   - Find way to search inbound flights.
-#   - Alternatives for multiple airports.
-#   - Alternatives for dates: +/- days for how much?
-#   - Better date ranges + validate them
-#   - Add WizzAir!
-#
-
-#
-# Transform to Javascript:
-#   - https://github.com/juliuste/flix
-#   - https://github.com/2BAD/ryanair
-# This way we could create a client-only website!
-#
-
-# TODO: Intermodality!
-# Check for both Flixbus and Ryanair...
-
-# - https://global.flixbus.com/bus/budapest
-# - Click on "Show more bus routes"
-# - Check destinations from Budapest 
-
-# https://global.api.flixbus.com/cms/cities/40de6527-8646-11e6-9066-549f350fcb0c/reachable?language=hu&limit=5&currency=HUF
-# https://global.api.flixbus.com/search/service/v4/search?from_city_id=40de6527-8646-11e6-9066-549f350fcb0c&to_city_id=d03c34f4-0b2c-42de-b5c6-792eedcd9cfb&departure_date=25.08.2024&products=%7B%22adult%22%3A1%7D&currency=EUR&locale=en&search_by=cities&include_after_midnight_rides=1&disable_distribusion_trips=0
-# https://global.api.flixbus.com/search/service/cities/details?locale=en&from_city_id=13938
-# https://global.api.flixbus.com/search/autocomplete/cities?q=Salzburg&lang=en&country=en&flixbus_cities_only=false&stations=true&popular_stations=true
