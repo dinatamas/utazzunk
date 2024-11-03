@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="{{ url_for( 'static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+  <script src="static/wizzair.js"></script>
+  <title>Flow Utazgatás</title>
+</head>
+<body>
+  <div class="container">
+    <p></p>
+    <h1>Wizzair</h1>
+    <p></p>
+    <button onclick="doWizzair()" class="btn btn-primary">Nyomod fasz</button>
+    <button onclick="window.location='/'" class="btn btn-secondary">Back</button>
+    <p></p>
+    <p id="myp"></p>
+    <table class="table">
+      <thead>
+        <th scope="col">Date</th>
+        <th scope="col">Destination</th>
+        <th scope="col">Price</th>
+      </thead>
+      <tbody id="mytable">
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 from datetime import datetime, timedelta
+from functools import cache
+import requests
 
 from flask import Flask, render_template, request, redirect, make_response
 
 from utazzunk import get_ryanair, get_flixbus_reachable
-
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -75,7 +76,7 @@ def do_magic(a, b, c):
     ))
 
 
-def do_ryanair():
+def do_ryanair1():
     depart_range = request.args['depart_range'].split(" - ")
     depart_from = _get_date(depart_range[0])
     depart_to = _get_date(depart_range[1])
@@ -103,6 +104,52 @@ def do_ryanair():
         cutoff=cutoff,
     ))
     return resp
+
+
+def do_ryanair2():
+    pass
+
+
+HEADERS = {
+    'User-Agent': 'AppleTV11,1/11.1',
+    'Referer': 'https://wizzair.com',
+    'x-requestverificationtoken': 'this-can-be-any-value',
+    'cookie': 'RequestVerificationToken=this-can-be-any-value',
+}
+
+WIZZAIR = "https://be.wizzair.com/25.2.0/Api"
+
+@cache
+def get_wizzair_codes():
+    # Also returns the connections... nice
+    MAP = f"{WIZZAIR}/asset/map?languageCode=hu-hu"
+    response = requests.get(MAP, headers=HEADERS)
+    res = {}
+    for c in response.json()["cities"]:
+        res[c["iata"]] = f"{c['shortName']}, {c['countryName']}"
+    return res
+    
+
+def do_wizzair2():
+    # Task: Use requests.Session() and visit wizzair beforehand?
+    # Task: Create a server-side wizzair request wrapper...
+    CHEAP_FLIGHTS = f"{WIZZAIR}/search/CheapFlights"
+    response = requests.post(CHEAP_FLIGHTS, headers=HEADERS, json={
+        "departureStation": "BUD",
+        "discountedOnly": False,
+        "months": 6,
+    })
+    IATA_CODES = get_wizzair_codes()
+    trips = []
+    for trip in response.json()["items"]:
+        # Task: Check price is actually in HUF!
+        date = datetime.strptime(trip["std"], "%Y-%m-%dT%H:%M:%S")
+        dest = trip["arrivalStation"]
+        dest = IATA_CODES.get(dest, "") + f" ({dest})"
+        price = int(trip["regularOriginalPrice"]["amount"])
+        trips.append({"date": date, "dest": dest, "price": price})
+    trips.sort(key=lambda x: x["date"])
+    return make_response(render_template("wizzair.html", trips=trips))
 
 
 def do_flixbus():
@@ -162,11 +209,18 @@ def do_holiday():
 
 @app.route("/getit")
 def getit():
-    if request.args["target"] == "ryanair":
-        resp = do_ryanair()
+    if request.args["target"] == "ryanair1":
+        resp = do_ryanair1()
+
+    # https://www.ryanair.com/gb/en/cheap-flights/
+    # if request.args["target"] == "ryanair2":
+    #    resp = do_ryanair2()
 
     if request.args["target"] == "flixbus":
         resp = do_flixbus()
+
+    if request.args["target"] == "wizzair2":
+        resp = do_wizzair2()
 
     if request.args["target"] == "magic_weekend":
         resp = do_magic(11, 2, "15:00")
