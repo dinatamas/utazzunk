@@ -32,3 +32,7 @@ def before_request():
         code = 301
         return redirect(url, code=code)
 ```
+
+- `flask --app app --debug run`
+
+https://github.com/krisukox/google-flights-api

@@ -8,6 +8,7 @@ HEADERS = {
     'Referer': 'https://wizzair.com',
     'x-requestverificationtoken': 'this-can-be-any-value',
     'cookie': 'RequestVerificationToken=this-can-be-any-value',
+    'Origin': 'https://wizzair.com',
 }
 
 response = requests.post(CHEAP_FLIGHTS, headers=HEADERS, json={
@@ -65,4 +66,3 @@ for trip in response.json()["outboundFlights"]:
     date = datetime.strptime(trip["date"], "%Y-%m-%dT%H:%M:%S")
     price = int(trip["price"]["amount"])
     print(f"{date} - {price}")
-
